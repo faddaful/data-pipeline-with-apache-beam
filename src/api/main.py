@@ -1,4 +1,5 @@
 import httpx
+import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 
@@ -15,5 +16,4 @@ async def fetch_data():
         return StreamingResponse(response.iter_bytes(), media_type="text/csv")
 
 if __name__ == "__main__":
-    import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
