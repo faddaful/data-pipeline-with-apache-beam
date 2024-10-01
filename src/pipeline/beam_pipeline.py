@@ -237,6 +237,6 @@ if __name__ == "__main__":
     # Run the Apache Beam pipeline with the provided input and output paths
     run_pipeline(input_file, output_file)
 
-# Notification that the pipeline has completed and show the output file location
-print(f"Pipeline completed. Output saved to {output_file}-00000-of-00001.json")
-print(f"Data quality issues saved to {output_file}_issues-00000-of-00001.json")
+    # Notification that the pipeline has completed and show the output file location
+    print(f"Pipeline completed. Output saved to {output_file}-00000-of-00001.json")
+    print(f"Data quality issues saved to {output_file}_issues-00000-of-00001.json")
