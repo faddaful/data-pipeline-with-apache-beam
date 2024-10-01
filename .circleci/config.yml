@@ -20,6 +20,16 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
+      # this env var must be set within the project
+      - run:
+          name: Process template file
+          environment:
+            # Environment variables would typically be served via a context
+            FOO: bar
+            PROVIDER: circleci
+          command: |
+            circleci env subst < template.json > deploy.json
+            cat deploy.json
       - setup_remote_docker
       - docker/check
       - docker/build:
@@ -40,4 +50,3 @@ workflows:
             branches:
               only: main
 
-              
