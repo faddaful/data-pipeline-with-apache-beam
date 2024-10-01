@@ -27,10 +27,10 @@ jobs:
       - setup_remote_docker
       - docker/check
       - docker/build:
-          image: faddaful/land-registry-pipeline
+          image: olayanjuibraheem/land-registry-pipeline
           tag: ${CIRCLE_SHA1}
       - docker/push:
-          image: faddaful/land-registry-pipeline
+          image: olayanjuibraheem/land-registry-pipeline
           tag: ${CIRCLE_SHA1}
 
 workflows:
