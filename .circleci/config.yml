@@ -15,7 +15,6 @@ jobs:
       - run:
           name: Run tests
           command: python -m pytest test/
-
   build-and-push-docker:
     docker:
       - image: cimg/base:stable
@@ -29,7 +28,6 @@ jobs:
       - docker/push:
           image: olayanjuibraheem/land-registry-pipeline
           tag: ${CIRCLE_SHA1}
-
 workflows:
   version: 2
   build-test-deploy:
@@ -41,3 +39,5 @@ workflows:
           filters:
             branches:
               only: main
+
+              
