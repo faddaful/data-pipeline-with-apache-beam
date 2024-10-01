@@ -4,16 +4,16 @@
 
 ## About
 
-This project is designed to collect and process property transaction data from the UK Land Registry. The data is transformed into newline-delimited JSON, with transactions grouped by property. The project is implemented using **Python**, **Apache Beam**, **FastAPI** locally. Scaling it, you can integrates with **Google Cloud** services like **BigQuery** and **Pub/Sub**. The pipeline is containerized with **Docker** and can be deployed and scaled using **Kubernetes**, **Terraform**, and **CircleCI** for CI/CD.
+This project is designed to collect and process property transaction data from the UK Land Registry. The data is transformed into newline-delimited JSON, with transactions grouped by property. The project is implemented using **Python**, **Apache Beam**, **FastAPI** locally. Scaling it, it can integrates with **Google Cloud** services like **BigQuery** and **Pub/Sub**. The pipeline is containerised with **Docker** and can be deployed and scaled using **Kubernetes**, **Terraform**, and **CircleCI** for CI/CD.
 
 ### Key Technologies
 - **Apache Beam**: Data processing pipeline.
 - **FastAPI**: API to fetch data.
 - **Google BigQuery**: Storage for processed data.
 - **Google Pub/Sub**: Pub/Sub integration for scheduling the pipeline.
-- **Docker**: Containerization for portability.
+- **Docker**: Containerisation for portability.
 - **Kubernetes**: Orchestration for scaling the project.
-- **Terraform**: Infrastructure as code for provisioning resources on Google Cloud.
+- **Terraform**: This is the IAAC for provisioning resources on Google Cloud.
 - **CircleCI**: CI/CD pipeline.
 
 ---
@@ -167,7 +167,7 @@ You can use **Google Pub/Sub** to trigger the pipeline based on new data or pred
 
 ## Deploying to Kubernetes
 
-The project can be containerized and deployed to **Kubernetes** for scalability and management.
+The project can be containerised and deployed to **Kubernetes** for scalability and management.
 
 ### 1. **Deploying the FastAPI App and Pipeline**
 
@@ -180,7 +180,7 @@ The project can be containerized and deployed to **Kubernetes** for scalability 
   kubectl apply -f k8s/service.yaml
   ```
 
-This will deploy the FastAPI server and allow you to interact with the API in your Kubernetes cluster.
+This will deploy the FastAPI server and allow to interact with the API in the Kubernetes cluster.
 
 ### 2. **Using Kubernetes CronJob to Schedule Pipeline Runs**
 
@@ -199,27 +199,18 @@ This will ensure the pipeline runs on a schedule, such as daily or hourly.
 This project includes a **CircleCI** configuration file (`.circleci/config.yml`) for automating testing, building, and deploying the project.
 
 ### Steps:
-1. Link your GitHub repository to CircleCI.
+1. Link GitHub repository to CircleCI.
 2. Update the CircleCI configuration with the necessary credentials for Google Cloud.
 3. On every push to the repository, CircleCI will:
    - Run tests using `pytest`.
    - Build and push Docker images.
-   - Deploy to your Kubernetes cluster or run the Dataflow pipeline.
+   - Deploy to Kubernetes cluster or run the Dataflow pipeline.
 
 ---
 
-## Scaling the Project
+## Connecting to dashboard for visualisation
 
-### 1. **Scaling with BigQuery**
-The processed data is stored in **Google BigQuery**. BigQuery is designed to handle large-scale datasets and can be used to query, analyze, and visualize the property transaction data efficiently.
-
-- You can connect BigQuery to your business intelligence tools like **Google Data Studio** to analyze the data.
-
-### 2. **Scaling with Pub/Sub and Dataflow**
-Using **Pub/Sub** and **Dataflow**, you can scale the data pipeline to handle large datasets automatically. Pub/Sub can be used to trigger the pipeline based on real-time data ingestion, and Dataflow allows you to process data in parallel across multiple workers.
-
-### 3. **Using Terraform for Infrastructure Management**
-The infrastructure (BigQuery, Pub/Sub, and Dataflow) is managed using **Terraform**, which allows for easy scaling, reproducibility, and management of cloud resources.
+- Connect BigQuery to business intelligence tools like **Google Data Studio** to analyse the data.
 
 ---
 
