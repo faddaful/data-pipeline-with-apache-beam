@@ -2,5 +2,4 @@ fastapi
 httpx
 apache-beam[gcp]
 pytest
-os
 uvicorn
