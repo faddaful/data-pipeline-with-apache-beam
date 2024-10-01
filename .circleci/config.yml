@@ -15,6 +15,10 @@ jobs:
       - run:
           name: Run tests
           command: python -m pytest test/
+      - run:
+          name: Run main
+          command: python -m src/
+
   build-and-push-docker:
     docker:
       - image: cimg/base:stable
