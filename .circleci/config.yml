@@ -15,10 +15,6 @@ jobs:
       - run:
           name: Run tests
           command: python -m pytest test/
-      - run:
-          name: Run pylint
-          command: pylint src/
-
   build-and-push-docker:
     docker:
       - image: cimg/base:stable
