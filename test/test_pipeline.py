@@ -1,19 +1,23 @@
 import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning)
-
+import pytest
+import json
 import apache_beam as beam
 from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that, equal_to
 from src.pipeline.beam_pipeline import ParseCSV, GroupTransactionsByProperty
-import json
+
+# Suppress specific warnings
+#warnings.filterwarnings("ignore", category=pytest.PytestCollectionWarning)
+warnings.filterwarnings("ignore", category=pytest.PytestWarning)
+
 
 def test_parse_csv():
-    with TestPipeline() as p:
+    with TestPipeline() as pipeline:
         input_data = [
             "1,100000,2021-01-01,AB1 2CD,D,N,F,123,FLAT 1,HIGH STREET,CITY,LONDON,GREATER LONDON,GREATER LONDON,A,A"
         ]
         output = (
-            p
+            pipeline
             | beam.Create(input_data)
             | beam.ParDo(ParseCSV())
         )
@@ -40,7 +44,7 @@ def test_parse_csv():
         ]))
 
 def test_group_transactions_by_property():
-    with TestPipeline() as p:
+    with TestPipeline() as pipeline:
         input_data = [
             ("property1", [
                 {"transaction_id": "1", "date": "2021-01-01", "price": 100000},
@@ -48,7 +52,7 @@ def test_group_transactions_by_property():
             ])
         ]
         output = (
-            p
+            pipeline
             | beam.Create(input_data)
             | beam.ParDo(GroupTransactionsByProperty())
         )
@@ -66,14 +70,14 @@ def test_group_transactions_by_property():
         assert_that(output, equal_to(expected_output))
 
 def test_end_to_end_pipeline():
-    with TestPipeline() as p:
+    with TestPipeline() as pipeline:
         input_data = [
             "1,100000,2021-01-01,AB1 2CD,D,N,F,123,FLAT 1,HIGH STREET,CITY,LONDON,GREATER LONDON,GREATER LONDON,A,A",
             "2,110000,2022-01-01,AB1 2CD,D,N,F,123,FLAT 1,HIGH STREET,CITY,LONDON,GREATER LONDON,GREATER LONDON,A,A"
         ]
         
         output = (
-            p
+            pipeline
             | beam.Create(input_data)
             | beam.ParDo(ParseCSV())
             | beam.GroupByKey()
@@ -92,3 +96,4 @@ def test_end_to_end_pipeline():
         ]
         
         assert_that(output, equal_to(expected_output))
+

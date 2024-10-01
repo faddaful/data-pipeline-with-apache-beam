@@ -94,4 +94,4 @@ if __name__ == "__main__":
     
     run_pipeline(input_file, output_file)
 
-print(f"Pipeline completed. Output saved to {output_file}-00000-of-00002.json")
+print(f"Pipeline completed. Output saved to {output_file}-00000-of-00001.json")
