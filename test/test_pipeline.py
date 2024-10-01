@@ -6,24 +6,32 @@ from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that, equal_to
 from src.pipeline.beam_pipeline import ParseCSV, GroupTransactionsByProperty
 
-# Suppress specific warnings
-#warnings.filterwarnings("ignore", category=pytest.PytestCollectionWarning)
+# Suppress specific warnings during the test run
 warnings.filterwarnings("ignore", category=pytest.PytestWarning)
 
-
 def test_parse_csv():
+    """
+    Test case to verify that the ParseCSV DoFn correctly parses a single CSV line.
+    
+    - Simulates a pipeline that processes a single CSV line and ensures that the
+      generated output is in the expected format (a tuple of property ID and transaction).
+    """
     with TestPipeline() as pipeline:
+        # Input data representing a single CSV row
         input_data = [
             "1,100000,2021-01-01,AB1 2CD,D,N,F,123,FLAT 1,HIGH STREET,CITY,LONDON,GREATER LONDON,GREATER LONDON,A,A"
         ]
+        
+        # Define the pipeline steps
         output = (
             pipeline
-            | beam.Create(input_data)
-            | beam.ParDo(ParseCSV())
+            | beam.Create(input_data)  # Create a PCollection from input data
+            | beam.ParDo(ParseCSV())   # Apply the ParseCSV transformation
         )
         
+        # Assert that the parsed output matches the expected property ID and transaction
         assert_that(output, equal_to([
-            (ParseCSV.generate_property_id(input_data[0].split(",")), {
+            (ParseCSV.generate_property_id(input_data[0].split(",")), {  # Generate property ID
                 "transaction_id": "1",
                 "price": 100000,
                 "date": "2021-01-01",
@@ -44,19 +52,30 @@ def test_parse_csv():
         ]))
 
 def test_group_transactions_by_property():
+    """
+    Test case to verify that GroupTransactionsByProperty DoFn groups transactions by property
+    and formats them into a JSON string.
+
+    - Simulates a pipeline that groups multiple transactions for a single property
+      and ensures the result is correctly formatted JSON.
+    """
     with TestPipeline() as pipeline:
+        # Input data containing transactions for a single property
         input_data = [
             ("property1", [
                 {"transaction_id": "1", "date": "2021-01-01", "price": 100000},
                 {"transaction_id": "2", "date": "2022-01-01", "price": 110000}
             ])
         ]
+        
+        # Define the pipeline steps
         output = (
             pipeline
-            | beam.Create(input_data)
-            | beam.ParDo(GroupTransactionsByProperty())
+            | beam.Create(input_data)  # Create a PCollection from input data
+            | beam.ParDo(GroupTransactionsByProperty())  # Apply the grouping and JSON formatting
         )
         
+        # Define the expected JSON output
         expected_output = [
             json.dumps({
                 "property_id": "property1",
@@ -67,24 +86,36 @@ def test_group_transactions_by_property():
             })
         ]
         
+        # Assert that the output matches the expected JSON
         assert_that(output, equal_to(expected_output))
 
 def test_end_to_end_pipeline():
+    """
+    End-to-end test case to verify the complete pipeline functionality.
+    
+    - Simulates an end-to-end run of the pipeline, starting from reading the CSV data,
+      parsing it into transactions, grouping by property, and outputting JSON-formatted results.
+    """
     with TestPipeline() as pipeline:
+        # Input data representing multiple rows from a CSV file
         input_data = [
             "1,100000,2021-01-01,AB1 2CD,D,N,F,123,FLAT 1,HIGH STREET,CITY,LONDON,GREATER LONDON,GREATER LONDON,A,A",
             "2,110000,2022-01-01,AB1 2CD,D,N,F,123,FLAT 1,HIGH STREET,CITY,LONDON,GREATER LONDON,GREATER LONDON,A,A"
         ]
         
+        # Define the pipeline steps
         output = (
             pipeline
-            | beam.Create(input_data)
-            | beam.ParDo(ParseCSV())
-            | beam.GroupByKey()
-            | beam.ParDo(GroupTransactionsByProperty())
+            | beam.Create(input_data)  # Create a PCollection from input CSV lines
+            | beam.ParDo(ParseCSV())   # Parse the CSV lines into transactions
+            | beam.GroupByKey()        # Group transactions by property ID
+            | beam.ParDo(GroupTransactionsByProperty())  # Format grouped transactions into JSON
         )
         
+        # Generate the expected property ID for the input data
         property_id = ParseCSV.generate_property_id(input_data[0].split(","))
+        
+        # Define the expected JSON output
         expected_output = [
             json.dumps({
                 "property_id": property_id,
@@ -95,5 +126,5 @@ def test_end_to_end_pipeline():
             })
         ]
         
+        # Assert that the output matches the expected end-to-end JSON result
         assert_that(output, equal_to(expected_output))
-

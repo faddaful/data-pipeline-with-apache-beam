@@ -2,11 +2,12 @@ version: '3'
 services:
   api:
     build: .
+    container_name: land-registry-pipeline
     ports:
       - "8000:8000"
     volumes:
       - ./src:/app/src
-    command: uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn src.api.main_yearly:app --host 0.0.0.0 --port 8000 --reload
 
   pipeline:
     build: .
