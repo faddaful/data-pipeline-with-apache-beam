@@ -26,9 +26,6 @@ jobs:
       - docker/build:
           image: olayanjuibraheem/land-registry-pipeline
           tag: ${CIRCLE_SHA1}
-      - run:
-          name: Docker Login
-          command: echo "${!PARAM_DOCKER_PASSWORD}" | docker login -u "${!PARAM_DOCKER_USERNAME}" --password-stdin "$PARAM_REGISTRY"
       - docker/push:
           image: olayanjuibraheem/land-registry-pipeline
           tag: ${CIRCLE_SHA1}
@@ -41,6 +38,7 @@ workflows:
       - build-and-push-docker:
           requires:
             - build-and-test
+          context: docker-hub-creds
           filters:
             branches:
               only: main
