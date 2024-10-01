@@ -16,7 +16,7 @@ jobs:
           name: Run tests
           command: python -m pytest test/
       - run:
-          name: Run main
+          name: Run pipeline
           command: python -m src/
 
   build-and-push-docker:
