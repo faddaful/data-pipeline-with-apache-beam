@@ -28,7 +28,7 @@ jobs:
           tag: ${CIRCLE_SHA1}
       - run:
           name: Docker Login
-          command: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+          command: echo "${!PARAM_DOCKER_PASSWORD}" | docker login -u "${!PARAM_DOCKER_USERNAME}" --password-stdin "$PARAM_REGISTRY"
       - docker/push:
           image: olayanjuibraheem/land-registry-pipeline
           tag: ${CIRCLE_SHA1}
