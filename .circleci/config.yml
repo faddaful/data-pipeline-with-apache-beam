@@ -29,6 +29,20 @@ jobs:
       - docker/push:
           image: olayanjuibraheem/land-registry-pipeline
           tag: ${CIRCLE_SHA1}
+run-pipeline:
+    docker:
+      - image: cimg/python:3.12
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: pip
+
+      - run:
+          name: Run API
+          command: uvicorn src.api.main_yearly:app --reload
+      - run:
+          name: Run pipeline
+          command: python src/pipeline/beam_pipeline.py --input_file input.csv --output_file output.json
 
 workflows:
   version: 2
