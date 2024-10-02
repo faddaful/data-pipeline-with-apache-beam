@@ -1,3 +1,8 @@
+"""
+Module to fetch property transaction data from UK Land Registry
+and serve it via a FastAPI service.
+"""
+
 import httpx
 import uvicorn
 from fastapi import FastAPI, HTTPException

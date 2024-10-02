@@ -1,3 +1,8 @@
+"""
+Module for an Apache Beam pipeline that processes property transaction
+data, performs data quality checks, and generates output in JSON format.
+"""
+
 import json
 import os
 import hashlib
@@ -8,11 +13,12 @@ from apache_beam.io.gcp.bigquery import WriteToBigQuery
 from apache_beam.io.gcp.gcsio import GcsIO
 from google.cloud import pubsub_v1
 
+
 class DataQualityCheck(beam.DoFn):
     """
     A Beam DoFn to perform data quality checks on each row of the input data.
     """
-    
+
     def process(self, element):
         """
         Process a single CSV row and perform data quality checks.
@@ -21,7 +27,8 @@ class DataQualityCheck(beam.DoFn):
             element (str): A single row from the CSV file as a string.
 
         Yields:
-            tuple: A tuple containing the original element and a list of any data quality issues.
+            tuple: A tuple containing the original element and a list of any
+            data quality issues.
         """
         fields = element.split(",")
         issues = []
@@ -50,19 +57,16 @@ class DataQualityCheck(beam.DoFn):
         # Yield the original element along with any issues found
         yield (element, issues)
 
+
 class ParseCSV(beam.DoFn):
     """
-    A Beam DoFn (function) to parse CSV rows and generate a property transaction record.
+    A Beam DoFn to parse CSV rows and generate a property transaction record.
 
-    This class processes each row from the CSV file, extracting fields and generating 
-    a unique property ID for each row. The result is a tuple containing the property ID 
-    and the associated transaction details.
-
-    Methods:
-        process: Processes a single CSV row, converts it into a transaction dictionary.
-        generate_property_id: Creates a unique property ID based on property address fields.
+    This class processes each row from the CSV file, extracting fields and
+    generating a unique property ID for each row. The result is a tuple
+    containing the property ID and the associated transaction details.
     """
-    
+
     def process(self, element):
         """
         Process a single CSV row into a transaction dictionary and yield the result.
@@ -79,10 +83,10 @@ class ParseCSV(beam.DoFn):
         try:
             # Split the CSV row into individual fields
             fields = element.split(",")
-            
+
             # Generate a unique property ID using selected fields
             property_id = self.generate_property_id(fields)
-            
+
             # Create a dictionary representing the transaction details
             transaction = {
                 "transaction_id": fields[0],
@@ -102,22 +106,23 @@ class ParseCSV(beam.DoFn):
                 "ppd_category_type": fields[14],
                 "record_status": fields[15]
             }
-            
+
             # Yield the property ID and transaction data as a tuple
             yield (property_id, transaction)
-        
-        except Exception as e:
+
+        except Exception as exc:
             # Handle any errors that occur during processing
             print(f"Error processing row: {element}")
-            print(f"Error details: {str(e)}")
+            print(f"Error details: {str(exc)}")
 
     @staticmethod
     def generate_property_id(fields):
         """
         Generate a unique property ID using selected address fields.
 
-        The property ID is created by concatenating several address fields (PAON, SAON, street, 
-        and postcode), removing spaces, converting to lowercase, and then applying MD5 hashing.
+        The property ID is created by concatenating several address fields
+        (PAON, SAON, street, and postcode), removing spaces, converting to
+        lowercase, and then applying MD5 hashing.
 
         Args:
             fields (list): List of fields from a CSV row.
@@ -127,7 +132,7 @@ class ParseCSV(beam.DoFn):
         """
         # Concatenate address-related fields, remove spaces, and convert to lowercase
         address = f"{fields[7]}{fields[8]}{fields[9]}{fields[3]}".lower().replace(" ", "")
-        
+
         # Return MD5 hash of the concatenated address string
         return hashlib.md5(address.encode()).hexdigest()
 
@@ -136,13 +141,10 @@ class GroupTransactionsByProperty(beam.DoFn):
     """
     A Beam DoFn to group transactions by property and convert them into JSON format.
 
-    This class processes the grouped property transactions, sorts them by date, and formats
-    them as a JSON object that can be output to a file or database.
-
-    Methods:
-        process: Processes grouped transactions and yields them as JSON strings.
+    This class processes the grouped property transactions, sorts them by date,
+    and formats them as a JSON object that can be output to a file or database.
     """
-    
+
     def process(self, element):
         """
         Process a group of transactions for a single property and yield them as a JSON string.
@@ -154,67 +156,56 @@ class GroupTransactionsByProperty(beam.DoFn):
             str: A JSON-formatted string representing the property and its transactions.
         """
         property_id, transactions = element
-        
+
         # Create a dictionary representing the property and its sorted transactions
         property_data = {
             "property_id": property_id,
             "transactions": sorted(transactions, key=lambda x: x["date"])  # Sort by transaction date
         }
-        
+
         # Yield the JSON string of the property data
         yield json.dumps(property_data)
+
 
 def run_pipeline(input_file, output_file):
     """
     Defines and runs the Apache Beam pipeline to process property transaction data.
 
-    The pipeline reads a CSV file, performs data quality checks, parses each row to generate 
-    transaction data, groups transactions by property, and outputs the result as JSON.
+    The pipeline reads a CSV file, performs data quality checks, parses each row
+    to generate transaction data, groups transactions by property, and outputs the
+    result as JSON.
 
     Args:
         input_file (str): Path to the input CSV file.
         output_file (str): Path to save the output JSON data.
     """
     options = PipelineOptions()
-    
-    with beam.Pipeline(options=options) as p:
+
+    with beam.Pipeline(options=options) as pipeline:
         # Read and perform data quality checks
-        data_with_quality_checks = (p
-            | "Read CSV" >> ReadFromText(input_file, skip_header_lines=1)
-            | "Data Quality Check" >> beam.ParDo(DataQualityCheck())
-        )
+        data_with_quality_checks = (pipeline
+                                    | "Read CSV" >> ReadFromText(input_file, skip_header_lines=1)
+                                    | "Data Quality Check" >> beam.ParDo(DataQualityCheck()))
 
         # Filter out rows with data quality issues
         clean_data = data_with_quality_checks | "Filter Clean Data" >> beam.Filter(lambda x: not x[1])
 
         # Process clean data
         output = (clean_data
-            | "Extract Clean Data" >> beam.Map(lambda x: x[0])
-            | "Parse CSV" >> beam.ParDo(ParseCSV())
-            | "Group by Property" >> beam.GroupByKey()
-            | "Format JSON" >> beam.ParDo(GroupTransactionsByProperty())
-        )
+                  | "Extract Clean Data" >> beam.Map(lambda x: x[0])
+                  | "Parse CSV" >> beam.ParDo(ParseCSV())
+                  | "Group by Property" >> beam.GroupByKey()
+                  | "Format JSON" >> beam.ParDo(GroupTransactionsByProperty()))
 
         # Write the output to a local JSON file
         output | "Write to Local File" >> beam.io.WriteToText(output_file, file_name_suffix='.json')
 
         # Write data quality issues to a separate file
-        issues = (data_with_quality_checks
-            | "Filter Issues" >> beam.Filter(lambda x: x[1])
-            | "Format Issues" >> beam.Map(lambda x: json.dumps({"row": x[0], "issues": x[1]}))
-            | "Write Issues" >> beam.io.WriteToText(output_file + "_issues", file_name_suffix='.json')
-        )
+        (data_with_quality_checks
+         | "Filter Issues" >> beam.Filter(lambda x: x[1])
+         | "Format Issues" >> beam.Map(lambda x: json.dumps({"row": x[0], "issues": x[1]}))
+         | "Write Issues" >> beam.io.WriteToText(output_file + "_issues", file_name_suffix='.json'))
 
-        # # For the future: Write to GCS (Google Cloud Storage)
-        # output | "Write to GCS" >> beam.io.WriteToText(f"gs://{land_registry_bucket}/input/data.json")
-
-        # # Optional: Publish a message to Pub/Sub after processing
-        # publisher = pubsub_v1.PublisherClient()
-        # topic_path = publisher.topic_path('land-registry-project-id', 'land-registry-updates')
-        # publisher.publish(topic_path, json.dumps({
-        #     'input_path': f"gs://{land_registry_bucket}/input/data.json",
-        #     'output_table': output_table
-        # }).encode('utf-8')
 
 if __name__ == "__main__":
     """
@@ -222,18 +213,18 @@ if __name__ == "__main__":
     the output directory exists before running the pipeline.
     """
     # input_file = "gs://land-registry-bucket/land-registry-data.csv"
-    # output_bucket = "land-registyry-project-id-processed-data"
+    # output_bucket = "land-registry-project-id-processed-data"
     # output_table = "land-registry-project:land-registry_dataset.land_registry_transactions"
     # run_pipeline(input_file, output_bucket, output_table)
-    
+
     # Set up relative paths for input and output files
     current_dir = os.path.dirname(os.path.abspath(__file__))
     input_file = os.path.join(current_dir, "fetch-data-2014-2024.csv")  # Input CSV file
     output_file = os.path.join(current_dir, "output", "transformed_data")  # Output directory for JSON data
-    
+
     # Ensure the output directory exists
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
-    
+
     # Run the Apache Beam pipeline with the provided input and output paths
     run_pipeline(input_file, output_file)
 

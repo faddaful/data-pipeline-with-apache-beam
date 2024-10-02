@@ -16,7 +16,7 @@ def test_parse_csv():
     - Simulates a pipeline that processes a single CSV line and ensures that the
       generated output is in the expected format (a tuple of property ID and transaction).
     """
-    with TestPipeline() as pipeline:
+    with TestPipeline() as p:
         # Input data representing a single CSV row
         input_data = [
             "1,100000,2021-01-01,AB1 2CD,D,N,F,123,FLAT 1,HIGH STREET,CITY,LONDON,GREATER LONDON,GREATER LONDON,A,A"
@@ -24,7 +24,7 @@ def test_parse_csv():
         
         # Define the pipeline steps
         output = (
-            pipeline
+            p
             | beam.Create(input_data)  # Create a PCollection from input data
             | beam.ParDo(ParseCSV())   # Apply the ParseCSV transformation
         )
@@ -59,7 +59,7 @@ def test_group_transactions_by_property():
     - Simulates a pipeline that groups multiple transactions for a single property
       and ensures the result is correctly formatted JSON.
     """
-    with TestPipeline() as pipeline:
+    with TestPipeline() as p:
         # Input data containing transactions for a single property
         input_data = [
             ("property1", [
@@ -70,7 +70,7 @@ def test_group_transactions_by_property():
         
         # Define the pipeline steps
         output = (
-            pipeline
+            p
             | beam.Create(input_data)  # Create a PCollection from input data
             | beam.ParDo(GroupTransactionsByProperty())  # Apply the grouping and JSON formatting
         )
@@ -96,7 +96,7 @@ def test_end_to_end_pipeline():
     - Simulates an end-to-end run of the pipeline, starting from reading the CSV data,
       parsing it into transactions, grouping by property, and outputting JSON-formatted results.
     """
-    with TestPipeline() as pipeline:
+    with TestPipeline() as p:
         # Input data representing multiple rows from a CSV file
         input_data = [
             "1,100000,2021-01-01,AB1 2CD,D,N,F,123,FLAT 1,HIGH STREET,CITY,LONDON,GREATER LONDON,GREATER LONDON,A,A",
@@ -105,7 +105,7 @@ def test_end_to_end_pipeline():
         
         # Define the pipeline steps
         output = (
-            pipeline
+            p
             | beam.Create(input_data)  # Create a PCollection from input CSV lines
             | beam.ParDo(ParseCSV())   # Parse the CSV lines into transactions
             | beam.GroupByKey()        # Group transactions by property ID
