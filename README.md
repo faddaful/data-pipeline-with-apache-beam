@@ -4,6 +4,9 @@
 
 This project is designed to collect and process property transaction data from the UK Land Registry. The data is transformed into newline-delimited JSON, with transactions grouped by property. The project is implemented using **Python**, **Apache Beam**, **FastAPI** locally. Scaling it, it can integrates with **Google Cloud** services like **BigQuery** and **Pub/Sub**. The pipeline is containerised with **Docker** and can be deployed and scaled using **Kubernetes**, **Terraform**, and **CircleCI** for CI/CD.
 
+## Architecture
+![Project_Architecture](land-registry-pipeline-diagram.svg)
+
 ### Key Technologies
 - **Apache Beam**: Data processing pipeline.
 - **FastAPI**: API to fetch data.
