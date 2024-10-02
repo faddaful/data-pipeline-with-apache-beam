@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 800 600">
+  <defs>
+    <style>
+      .box { fill: #f0f0f0; stroke: #333; stroke-width: 2; }
+      .arrow { fill: none; stroke: #666; stroke-width: 2; marker-end: url(#arrowhead); }
+      .label { font-family: Arial, sans-serif; font-size: 14px; }
+      .title { font-family: Arial, sans-serif; font-size: 24px; font-weight: bold; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" />
+    </marker>
+  </defs>
+  
+  <text x="400" y="40" text-anchor="middle" class="title">Land Registry Pipeline Architecture</text>
+
+  <!-- Data Source -->
+  <rect x="50" y="100" width="150" height="60" rx="5" class="box" />
+  <text x="125" y="140" text-anchor="middle" class="label">UK Land Registry</text>
+
+  <!-- API -->
+  <rect x="300" y="100" width="150" height="60" rx="5" class="box" />
+  <text x="375" y="140" text-anchor="middle" class="label">FastAPI Service</text>
+
+  <!-- Apache Beam Pipeline -->
+  <rect x="300" y="250" width="150" height="60" rx="5" class="box" />
+  <text x="375" y="290" text-anchor="middle" class="label">Apache Beam Pipeline</text>
+
+  <!-- Docker Container -->
+  <rect x="275" y="75" width="200" height="260" rx="10" stroke-dasharray="5,5" fill="none" stroke="#333" />
+  <text x="375" y="350" text-anchor="middle" class="label">Docker Container</text>
+
+  <!-- Output -->
+  <rect x="600" y="250" width="150" height="60" rx="5" class="box" />
+  <text x="675" y="290" text-anchor="middle" class="label">JSON Output</text>
+
+  <!-- CI/CD -->
+  <rect x="300" y="400" width="150" height="60" rx="5" class="box" />
+  <text x="375" y="440" text-anchor="middle" class="label">CircleCI (CI/CD)</text>
+
+  <!-- Arrows -->
+  <line x1="200" y1="130" x2="290" y2="130" class="arrow" />
+  <line x1="375" y1="160" x2="375" y2="240" class="arrow" />
+  <line x1="450" y1="280" x2="590" y2="280" class="arrow" />
+  <line x1="375" y1="320" x2="375" y2="390" class="arrow" />
+
+  <!-- Labels -->
+  <text x="245" y="120" class="label">Fetch Data</text>
+  <text x="390" y="210" class="label">Pass Data</text>
+  <text x="520" y="270" class="label">Output</text>
+  <text x="390" y="370" class="label">Deploy</text>
+</svg>
