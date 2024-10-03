@@ -1,3 +1,6 @@
+"""
+Test module for FastAPI application to verify the pipeline deployment.
+"""
 import warnings
 import pytest
 import json

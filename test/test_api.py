@@ -1,3 +1,6 @@
+"""
+Test module for FastAPI application to verify the '/fetch-data' endpoint.
+"""
 import warnings
 from fastapi.testclient import TestClient
 from src.api.main import app
