@@ -95,6 +95,7 @@ To run the FastAPI server locally:
 
 ```bash
 uvicorn src.api.main:app --reload
+uvicorn src.api.main_yearly:app --reload
 ```
 
 This will start the API on `http://127.0.0.1:8000`. You can fetch the Land Registry data by hitting the `/fetch-data` or `/fetch-data-2014-2024` endpoint.
