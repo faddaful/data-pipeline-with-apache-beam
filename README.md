@@ -95,6 +95,7 @@ To run the FastAPI server locally:
 
 ```bash
 uvicorn src.api.main:app --reload
+#Use the below to fetch data for a specific year range
 uvicorn src.api.main_yearly:app --reload
 ```
 
