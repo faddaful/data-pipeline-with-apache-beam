@@ -68,7 +68,7 @@ async def save_file(content):
 
 @app.get("/fetch-data-2014-2024")
 async def fetch_data():
-    """
+    """     
     Fetch property transaction data for the years 2014-2024 and return it
     as a CSV file.
 

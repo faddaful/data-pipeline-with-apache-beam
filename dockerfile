@@ -1,5 +1,5 @@
 # Install python package
-FROM python:3.9-slim
+FROM python:3.12-slim
 
 # Set the working directory in the container
 WORKDIR /app
@@ -14,4 +14,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 8000
 
 # Run the script when the container launches
-CMD ["python", "src/pipeline/beam_pipeline.py"]
+CMD ["/bin/sh", "-c", "python src/api/main_yearly.py && python command2.py && python src/pipeline/beam_pipeline.py"]
