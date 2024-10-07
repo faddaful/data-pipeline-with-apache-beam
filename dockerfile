@@ -14,4 +14,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 8000
 
 # Run the script when the container launches
-CMD ["/bin/sh", "-c", "python src/api/main_yearly.py && python command2.py && python src/pipeline/beam_pipeline.py"]
+CMD ["/bin/sh", "-c", "python src/api/main_yearly.py && python src/pipeline/beam_pipeline.py"]
